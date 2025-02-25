@@ -1,0 +1,759 @@
+Hugging Face's logo
+Hugging Face
+ 
+Models
+Datasets
+Spaces
+Posts
+Docs
+Enterprise
+Pricing
+
+Log In
+Sign Up
+Transformers
+
+
+Search documentation
+⌘K
+
+
+
+ 140,133
+GET STARTED
+🤗 Transformers
+Quick tour
+Installation
+Adding a new model to `transformers`
+TUTORIALS
+Run inference with pipelines
+Write portable code with AutoClass
+Preprocess data
+Fine-tune a pretrained model
+Train with a script
+Set up distributed training with 🤗 Accelerate
+Load and train adapters with 🤗 PEFT
+Share your model
+Agents 101
+Agents, supercharged - Multi-agents, External tools, and more
+Generation with LLMs
+Chatting with Transformers
+TASK GUIDES
+NATURAL LANGUAGE PROCESSING
+AUDIO
+COMPUTER VISION
+MULTIMODAL
+GENERATION
+CHAT TEMPLATES
+PROMPTING
+DEVELOPER GUIDES
+Use fast tokenizers from 🤗 Tokenizers
+Run inference with multilingual models
+Use model-specific APIs
+Share a custom model
+Trainer
+Run training on Amazon SageMaker
+Export to ONNX
+Export to TFLite
+Export to TorchScript
+Notebooks with examples
+Community resources
+Troubleshoot
+Interoperability with GGUF files
+Interoperability with TikToken files
+Modularity in `transformers`
+Model Hacking (overwriting a class to your usage)
+QUANTIZATION METHODS
+Getting started
+bitsandbytes
+GPTQ
+AWQ
+AQLM
+SpQR
+VPTQ
+Quanto
+EETQ
+HIGGS
+HQQ
+FBGEMM_FP8
+Optimum
+TorchAO
+BitNet
+compressed-tensors
+Fine-grained FP8
+Contribute new quantization method
+PERFORMANCE AND SCALABILITY
+Overview
+LLM inference optimization
+EFFICIENT TRAINING TECHNIQUES
+Methods and tools for efficient training on a single GPU
+Multiple GPUs and parallelism
+Fully Sharded Data Parallel
+DeepSpeed
+Efficient training on CPU
+Distributed CPU training
+Training on TPU with TensorFlow
+PyTorch training on Apple silicon
+Custom hardware for training
+Hyperparameter Search using Trainer API
+OPTIMIZING INFERENCE
+CPU inference
+GPU inference
+Multi-GPU inference
+Instantiate a big model
+Debugging
+XLA Integration for TensorFlow Models
+Optimize inference using `torch.compile()`
+CONTRIBUTE
+How to contribute to 🤗 Transformers?
+How to add a model to 🤗 Transformers?
+How to add a pipeline to 🤗 Transformers?
+Testing
+Checks on a Pull Request
+CONCEPTUAL GUIDES
+Philosophy
+Glossary
+What 🤗 Transformers can do
+How 🤗 Transformers solve tasks
+The Transformer model family
+Summary of the tokenizers
+Attention mechanisms
+Padding and truncation
+BERTology
+Perplexity of fixed-length models
+Pipelines for webserver inference
+Model training anatomy
+Getting the most out of LLMs
+API
+MAIN CLASSES
+Agents and Tools
+Auto Classes
+Backbones
+Callbacks
+Configuration
+Data Collator
+Keras callbacks
+Logging
+Models
+Text Generation
+ONNX
+Optimization
+Model outputs
+Pipelines
+Processors
+Quantization
+Tokenizer
+Trainer
+DeepSpeed
+ExecuTorch
+Feature Extractor
+Image Processor
+MODELS
+TEXT MODELS
+VISION MODELS
+AUDIO MODELS
+VIDEO MODELS
+MULTIMODAL MODELS
+REINFORCEMENT LEARNING MODELS
+TIME SERIES MODELS
+GRAPH MODELS
+INTERNAL HELPERS
+Custom Layers and Utilities
+Utilities for pipelines
+Utilities for Tokenizers
+Utilities for Trainer
+Utilities for Generation
+Utilities for Image Processors
+Utilities for Audio processing
+General Utilities
+Utilities for Time Series
+Join the Hugging Face community
+and get access to the augmented documentation experience
+
+
+Collaborate on models, datasets and Spaces
+
+Faster examples with accelerated inference
+
+Switch between documentation themes
+Sign Up
+to get started
+Processors
+
+Processors can mean two different things in the Transformers library:
+
+the objects that pre-process inputs for multi-modal models such as Wav2Vec2 (speech and text) or CLIP (text and vision)
+deprecated objects that were used in older versions of the library to preprocess data for GLUE or SQUAD.
+Multi-modal processors
+
+Any multi-modal model will require an object to encode or decode the data that groups several modalities (among text, vision and audio). This is handled by objects called processors, which group together two or more processing objects such as tokenizers (for the text modality), image processors (for vision) and feature extractors (for audio).
+
+Those processors inherit from the following base class that implements the saving and loading functionality:
+
+class transformers.ProcessorMixin
+<
+source
+>
+( *args**kwargs )
+
+This is a mixin used to provide saving/loading functionality for all processor classes.
+
+apply_chat_template
+<
+source
+>
+( conversation: typing.Union[typing.List[typing.Dict[str, str]], typing.List[typing.List[typing.Dict[str, str]]]]chat_template: typing.Optional[str] = None**kwargs: typing_extensions.Unpack[transformers.processing_utils.AllKwargsForChatTemplate] )
+
+Parameters
+
+conversation (Union[List[Dict, [str, str]], List[List[Dict[str, str]]]]) — The conversation to format.
+
+chat_template (Optional[str], optional) — The Jinja template to use for formatting the conversation. If not provided, the tokenizer’s chat template is used.
+Similar to the apply_chat_template method on tokenizers, this method applies a Jinja template to input conversations to turn them into a single tokenizable string.
+
+The input is expected to be in the following format, where each message content is a list consisting of text and optionally image or video inputs. One can also provide an image, video, URL or local path which will be used to form pixel_values when return_dict=True. If not provided, one will get only the formatted text, optionally tokenized text.
+
+conversation = [ { “role”: “user”, “content”: [ {“type”: “image”, “image”: “https://www.ilankelman.org/stopsigns/australia.jpg”}, {“type”: “text”, “text”: “Please describe this image in detail.”}, ], }, ]
+from_args_and_dict
+<
+source
+>
+( argsprocessor_dict: typing.Dict[str, typing.Any]**kwargs ) → ~processing_utils.ProcessingMixin
+
+Parameters
+
+processor_dict (Dict[str, Any]) — Dictionary that will be used to instantiate the processor object. Such a dictionary can be retrieved from a pretrained checkpoint by leveraging the ~processing_utils.ProcessingMixin.to_dict method.
+
+kwargs (Dict[str, Any]) — Additional parameters from which to initialize the processor object.
+Returns
+
+~processing_utils.ProcessingMixin
+
+The processor object instantiated from those parameters.
+Instantiates a type of ~processing_utils.ProcessingMixin from a Python dictionary of parameters.
+from_pretrained
+<
+source
+>
+( pretrained_model_name_or_path: typing.Union[str, os.PathLike]cache_dir: typing.Union[str, os.PathLike, NoneType] = Noneforce_download: bool = Falselocal_files_only: bool = Falsetoken: typing.Union[str, bool, NoneType] = Nonerevision: str = 'main'**kwargs )
+
+Parameters
+
+pretrained_model_name_or_path (str or os.PathLike) — This can be either:
+a string, the model id of a pretrained feature_extractor hosted inside a model repo on huggingface.co.
+a path to a directory containing a feature extractor file saved using the save_pretrained() method, e.g., ./my_model_directory/.
+a path or url to a saved feature extractor JSON file, e.g., ./my_model_directory/preprocessor_config.json.
+
+**kwargs — Additional keyword arguments passed along to both from_pretrained() and ~tokenization_utils_base.PreTrainedTokenizer.from_pretrained.
+Instantiate a processor associated with a pretrained model.
+
+This class method is simply calling the feature extractor from_pretrained(), image processor ImageProcessingMixin and the tokenizer ~tokenization_utils_base.PreTrainedTokenizer.from_pretrained methods. Please refer to the docstrings of the methods above for more information.
+get_processor_dict
+<
+source
+>
+( pretrained_model_name_or_path: typing.Union[str, os.PathLike]**kwargs ) → Tuple[Dict, Dict]
+
+Parameters
+
+pretrained_model_name_or_path (str or os.PathLike) — The identifier of the pre-trained checkpoint from which we want the dictionary of parameters.
+
+subfolder (str, optional, defaults to "") — In case the relevant files are located inside a subfolder of the model repo on huggingface.co, you can specify the folder name here.
+Returns
+
+Tuple[Dict, Dict]
+
+The dictionary(ies) that will be used to instantiate the processor object.
+From a pretrained_model_name_or_path, resolve to a dictionary of parameters, to be used for instantiating a processor of type ~processing_utils.ProcessingMixin using from_args_and_dict.
+post_process_image_text_to_text
+<
+source
+>
+( generated_outputs ) → List[str]
+
+Parameters
+
+generated_outputs (torch.Tensor or np.ndarray) — The output of the model generate function. The output is expected to be a tensor of shape (batch_size, sequence_length) or (sequence_length,).
+Returns
+
+List[str]
+
+The decoded text.
+Post-process the output of a vlm to decode the text.
+prepare_and_validate_optional_call_args
+<
+source
+>
+( *args )
+
+Matches optional positional arguments to their corresponding names in optional_call_args in the processor class in the order they are passed to the processor call.
+
+Note that this should only be used in the __call__ method of the processors with special arguments. Special arguments are arguments that aren’t text, images, audio, nor videos but also aren’t passed to the tokenizer, image processor, etc. Examples of such processors are:
+
+CLIPSegProcessor
+LayoutLMv2Processor
+OwlViTProcessor
+Also note that passing by position to the processor call is now deprecated and will be disallowed in future versions. We only have this for backward compatibility.
+
+Example: Suppose that the processor class has optional_call_args = ["arg_name_1", "arg_name_2"].
+
+
+And we define the call method as:
+
+Copied
+def __call__(
+    self,
+    text: str,
+    images: Optional[ImageInput] = None,
+    *arg,
+    audio=None,
+    videos=None,
+)
+
+Then, if we call the processor as:
+
+Copied
+images = [...]
+processor("What is common in these images?", images, arg_value_1, arg_value_2)
+
+Then, this method will return:
+
+Copied
+{
+    "arg_name_1": arg_value_1,
+    "arg_name_2": arg_value_2,
+}
+which we could then pass as kwargs to `self._merge_kwargs`
+push_to_hub
+<
+source
+>
+( repo_id: struse_temp_dir: typing.Optional[bool] = Nonecommit_message: typing.Optional[str] = Noneprivate: typing.Optional[bool] = Nonetoken: typing.Union[bool, str, NoneType] = Nonemax_shard_size: typing.Union[int, str, NoneType] = '5GB'create_pr: bool = Falsesafe_serialization: bool = Truerevision: str = Nonecommit_description: str = Nonetags: typing.Optional[typing.List[str]] = None**deprecated_kwargs )
+
+Expand 11 parameters
+Parameters
+
+repo_id (str) — The name of the repository you want to push your processor to. It should contain your organization name when pushing to a given organization.
+
+use_temp_dir (bool, optional) — Whether or not to use a temporary directory to store the files saved before they are pushed to the Hub. Will default to True if there is no directory named like repo_id, False otherwise.
+
+commit_message (str, optional) — Message to commit while pushing. Will default to "Upload processor".
+
+private (bool, optional) — Whether to make the repo private. If None (default), the repo will be public unless the organization’s default is private. This value is ignored if the repo already exists.
+
+token (bool or str, optional) — The token to use as HTTP bearer authorization for remote files. If True, will use the token generated when running huggingface-cli login (stored in ~/.huggingface). Will default to True if repo_url is not specified.
+
+max_shard_size (int or str, optional, defaults to "5GB") — Only applicable for models. The maximum size for a checkpoint before being sharded. Checkpoints shard will then be each of size lower than this size. If expressed as a string, needs to be digits followed by a unit (like "5MB"). We default it to "5GB" so that users can easily load models on free-tier Google Colab instances without any CPU OOM issues.
+
+create_pr (bool, optional, defaults to False) — Whether or not to create a PR with the uploaded files or directly commit.
+
+safe_serialization (bool, optional, defaults to True) — Whether or not to convert the model weights in safetensors format for safer serialization.
+
+revision (str, optional) — Branch to push the uploaded files to.
+
+commit_description (str, optional) — The description of the commit that will be created
+
+tags (List[str], optional) — List of tags to push on the Hub.
+Upload the processor files to the 🤗 Model Hub.
+
+
+Examples:
+
+Copied
+from transformers import AutoProcessor
+
+processor = AutoProcessor.from_pretrained("google-bert/bert-base-cased")
+
+# Push the processor to your namespace with the name "my-finetuned-bert".
+processor.push_to_hub("my-finetuned-bert")
+
+# Push the processor to an organization with the name "my-finetuned-bert".
+processor.push_to_hub("huggingface/my-finetuned-bert")
+register_for_auto_class
+<
+source
+>
+( auto_class = 'AutoProcessor' )
+
+Parameters
+
+auto_class (str or type, optional, defaults to "AutoProcessor") — The auto class to register this new feature extractor with.
+Register this class with a given auto class. This should only be used for custom feature extractors as the ones in the library are already mapped with AutoProcessor.
+
+This API is experimental and may have some slight breaking changes in the next releases.
+save_pretrained
+<
+source
+>
+( save_directorypush_to_hub: bool = False**kwargs )
+
+Parameters
+
+save_directory (str or os.PathLike) — Directory where the feature extractor JSON file and the tokenizer files will be saved (directory will be created if it does not exist).
+
+push_to_hub (bool, optional, defaults to False) — Whether or not to push your model to the Hugging Face model hub after saving it. You can specify the repository you want to push to with repo_id (will default to the name of save_directory in your namespace).
+
+kwargs (Dict[str, Any], optional) — Additional key word arguments passed along to the push_to_hub() method.
+Saves the attributes of this processor (feature extractor, tokenizer…) in the specified directory so that it can be reloaded using the from_pretrained() method.
+
+This class method is simply calling save_pretrained() and save_pretrained(). Please refer to the docstrings of the methods above for more information.
+to_dict
+<
+source
+>
+( ) → Dict[str, Any]
+
+Returns
+
+Dict[str, Any]
+
+Dictionary of all the attributes that make up this processor instance.
+Serializes this instance to a Python dictionary.
+to_json_file
+<
+source
+>
+( json_file_path: typing.Union[str, os.PathLike] )
+
+Parameters
+
+json_file_path (str or os.PathLike) — Path to the JSON file in which this processor instance’s parameters will be saved.
+Save this instance to a JSON file.
+to_json_string
+<
+source
+>
+( ) → str
+
+Returns
+
+str
+
+String containing all the attributes that make up this feature_extractor instance in JSON format.
+Serializes this instance to a JSON string.
+Deprecated processors
+
+All processors follow the same architecture which is that of the DataProcessor. The processor returns a list of InputExample. These InputExample can be converted to InputFeatures in order to be fed to the model.
+
+class transformers.DataProcessor
+<
+source
+>
+( )
+
+Base class for data converters for sequence classification data sets.
+
+get_dev_examples
+<
+source
+>
+( data_dir )
+
+Gets a collection of InputExample for the dev set.
+get_example_from_tensor_dict
+<
+source
+>
+( tensor_dict )
+
+Parameters
+
+tensor_dict — Keys and values should match the corresponding Glue tensorflow_dataset examples.
+Gets an example from a dict with tensorflow tensors.
+get_labels
+<
+source
+>
+( )
+
+Gets the list of labels for this data set.
+get_test_examples
+<
+source
+>
+( data_dir )
+
+Gets a collection of InputExample for the test set.
+get_train_examples
+<
+source
+>
+( data_dir )
+
+Gets a collection of InputExample for the train set.
+tfds_map
+<
+source
+>
+( example )
+
+Some tensorflow_datasets datasets are not formatted the same way the GLUE datasets are. This method converts examples to the correct format.
+class transformers.InputExample
+<
+source
+>
+( guid: strtext_a: strtext_b: typing.Optional[str] = Nonelabel: typing.Optional[str] = None )
+
+Parameters
+
+guid — Unique id for the example.
+
+text_a — string. The untokenized text of the first sequence. For single sequence tasks, only this sequence must be specified.
+
+text_b — (Optional) string. The untokenized text of the second sequence. Only must be specified for sequence pair tasks.
+
+label — (Optional) string. The label of the example. This should be specified for train and dev examples, but not for test examples.
+A single training/test example for simple sequence classification.
+
+to_json_string
+<
+source
+>
+( )
+
+Serializes this instance to a JSON string.
+class transformers.InputFeatures
+<
+source
+>
+( input_ids: typing.List[int]attention_mask: typing.Optional[typing.List[int]] = Nonetoken_type_ids: typing.Optional[typing.List[int]] = Nonelabel: typing.Union[int, float, NoneType] = None )
+
+Parameters
+
+input_ids — Indices of input sequence tokens in the vocabulary.
+
+attention_mask — Mask to avoid performing attention on padding token indices. Mask values selected in [0, 1]: Usually 1 for tokens that are NOT MASKED, 0 for MASKED (padded) tokens.
+
+token_type_ids — (Optional) Segment token indices to indicate first and second portions of the inputs. Only some models use them.
+
+label — (Optional) Label corresponding to the input. Int for classification problems, float for regression problems.
+A single set of features of data. Property names are the same names as the corresponding inputs to a model.
+
+to_json_string
+<
+source
+>
+( )
+
+Serializes this instance to a JSON string.
+GLUE
+
+General Language Understanding Evaluation (GLUE) is a benchmark that evaluates the performance of models across a diverse set of existing NLU tasks. It was released together with the paper GLUE: A multi-task benchmark and analysis platform for natural language understanding
+
+This library hosts a total of 10 processors for the following tasks: MRPC, MNLI, MNLI (mismatched), CoLA, SST2, STSB, QQP, QNLI, RTE and WNLI.
+
+Those processors are:
+
+~data.processors.utils.MrpcProcessor
+~data.processors.utils.MnliProcessor
+~data.processors.utils.MnliMismatchedProcessor
+~data.processors.utils.Sst2Processor
+~data.processors.utils.StsbProcessor
+~data.processors.utils.QqpProcessor
+~data.processors.utils.QnliProcessor
+~data.processors.utils.RteProcessor
+~data.processors.utils.WnliProcessor
+Additionally, the following method can be used to load values from a data file and convert them to a list of InputExample.
+
+transformers.glue_convert_examples_to_features
+<
+source
+>
+( examples: typing.Union[typing.List[transformers.data.processors.utils.InputExample], ForwardRef('tf.data.Dataset')]tokenizer: PreTrainedTokenizermax_length: typing.Optional[int] = Nonetask = Nonelabel_list = Noneoutput_mode = None )
+
+Parameters
+
+examples — List of InputExamples or tf.data.Dataset containing the examples.
+
+tokenizer — Instance of a tokenizer that will tokenize the examples
+
+max_length — Maximum example length. Defaults to the tokenizer’s max_len
+
+task — GLUE task
+
+label_list — List of labels. Can be obtained from the processor using the processor.get_labels() method
+
+output_mode — String indicating the output mode. Either regression or classification
+Loads a data file into a list of InputFeatures
+XNLI
+
+The Cross-Lingual NLI Corpus (XNLI) is a benchmark that evaluates the quality of cross-lingual text representations. XNLI is crowd-sourced dataset based on MultiNLI: pairs of text are labeled with textual entailment annotations for 15 different languages (including both high-resource language such as English and low-resource languages such as Swahili).
+
+It was released together with the paper XNLI: Evaluating Cross-lingual Sentence Representations
+
+This library hosts the processor to load the XNLI data:
+
+~data.processors.utils.XnliProcessor
+Please note that since the gold labels are available on the test set, evaluation is performed on the test set.
+
+An example using these processors is given in the run_xnli.py script.
+
+SQuAD
+
+The Stanford Question Answering Dataset (SQuAD) is a benchmark that evaluates the performance of models on question answering. Two versions are available, v1.1 and v2.0. The first version (v1.1) was released together with the paper SQuAD: 100,000+ Questions for Machine Comprehension of Text. The second version (v2.0) was released alongside the paper Know What You Don’t Know: Unanswerable Questions for SQuAD.
+
+This library hosts a processor for each of the two versions:
+
+Processors
+
+Those processors are:
+
+~data.processors.utils.SquadV1Processor
+~data.processors.utils.SquadV2Processor
+They both inherit from the abstract class ~data.processors.utils.SquadProcessor
+
+class transformers.data.processors.squad.SquadProcessor
+<
+source
+>
+( )
+
+Processor for the SQuAD data set. overridden by SquadV1Processor and SquadV2Processor, used by the version 1.1 and version 2.0 of SQuAD, respectively.
+
+get_dev_examples
+<
+source
+>
+( data_dirfilename = None )
+
+Parameters
+
+data_dir — Directory containing the data files used for training and evaluating.
+
+filename — None by default, specify this if the evaluation file has a different name than the original one which is dev-v1.1.json and dev-v2.0.json for squad versions 1.1 and 2.0 respectively.
+Returns the evaluation example from the data directory.
+get_examples_from_dataset
+<
+source
+>
+( datasetevaluate = False )
+
+Parameters
+
+dataset — The tfds dataset loaded from tensorflow_datasets.load(“squad”)
+
+evaluate — Boolean specifying if in evaluation mode or in training mode
+Creates a list of SquadExample using a TFDS dataset.
+
+
+Examples:
+
+Copied
+import tensorflow_datasets as tfds
+
+dataset = tfds.load("squad")
+
+training_examples = get_examples_from_dataset(dataset, evaluate=False)
+evaluation_examples = get_examples_from_dataset(dataset, evaluate=True)
+get_train_examples
+<
+source
+>
+( data_dirfilename = None )
+
+Parameters
+
+data_dir — Directory containing the data files used for training and evaluating.
+
+filename — None by default, specify this if the training file has a different name than the original one which is train-v1.1.json and train-v2.0.json for squad versions 1.1 and 2.0 respectively.
+Returns the training examples from the data directory.
+Additionally, the following method can be used to convert SQuAD examples into ~data.processors.utils.SquadFeatures that can be used as model inputs.
+
+transformers.squad_convert_examples_to_features
+<
+source
+>
+( examplestokenizermax_seq_lengthdoc_stridemax_query_lengthis_trainingpadding_strategy = 'max_length'return_dataset = Falsethreads = 1tqdm_enabled = True )
+
+Parameters
+
+examples — list of SquadExample
+
+tokenizer — an instance of a child of PreTrainedTokenizer
+
+max_seq_length — The maximum sequence length of the inputs.
+
+doc_stride — The stride used when the context is too large and is split across several features.
+
+max_query_length — The maximum length of the query.
+
+is_training — whether to create features for model evaluation or model training.
+
+padding_strategy — Default to “max_length”. Which padding strategy to use
+
+return_dataset — Default False. Either ‘pt’ or ‘tf’. if ‘pt’: returns a torch.data.TensorDataset, if ‘tf’: returns a tf.data.Dataset
+
+threads — multiple processing threads.
+Converts a list of examples into a list of features that can be directly given as input to a model. It is model-dependant and takes advantage of many of the tokenizer’s features to create the model’s inputs.
+
+
+Example:
+
+Copied
+processor = SquadV2Processor()
+examples = processor.get_dev_examples(data_dir)
+
+features = squad_convert_examples_to_features(
+    examples=examples,
+    tokenizer=tokenizer,
+    max_seq_length=args.max_seq_length,
+    doc_stride=args.doc_stride,
+    max_query_length=args.max_query_length,
+    is_training=not evaluate,
+)
+These processors as well as the aforementioned method can be used with files containing the data as well as with the tensorflow_datasets package. Examples are given below.
+
+Example usage
+
+Here is an example using the processors as well as the conversion method using data files:
+
+Copied
+# Loading a V2 processor
+processor = SquadV2Processor()
+examples = processor.get_dev_examples(squad_v2_data_dir)
+
+# Loading a V1 processor
+processor = SquadV1Processor()
+examples = processor.get_dev_examples(squad_v1_data_dir)
+
+features = squad_convert_examples_to_features(
+    examples=examples,
+    tokenizer=tokenizer,
+    max_seq_length=max_seq_length,
+    doc_stride=args.doc_stride,
+    max_query_length=max_query_length,
+    is_training=not evaluate,
+)
+Using tensorflow_datasets is as easy as using a data file:
+
+Copied
+# tensorflow_datasets only handle Squad V1.
+tfds_examples = tfds.load("squad")
+examples = SquadV1Processor().get_examples_from_dataset(tfds_examples, evaluate=evaluate)
+
+features = squad_convert_examples_to_features(
+    examples=examples,
+    tokenizer=tokenizer,
+    max_seq_length=max_seq_length,
+    doc_stride=args.doc_stride,
+    max_query_length=max_query_length,
+    is_training=not evaluate,
+)
+Another example using these processors is given in the run_squad.py script.
+
+<
+>
+Update on GitHub
+Pipelines
+←
+Pipelines
+Quantization
+→
+Processors
+Multi-modal processors
+Deprecated processors
+GLUE
+XNLI
+SQuAD
+Processors
+Example usage
