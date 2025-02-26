@@ -211,6 +211,14 @@ Copied
 [{'entity_group': 'PER', 'score': 0.99816, 'word': 'Sylvain', 'start': 11, 'end': 18}, 
  {'entity_group': 'ORG', 'score': 0.97960, 'word': 'Hugging Face', 'start': 33, 'end': 45}, 
  {'entity_group': 'LOC', 'score': 0.99321, 'word': 'Brooklyn', 'start': 49, 'end': 57}
+
+//
+import numpy as np
+import pandas as pd 
+import matplotlib.pyplot as plt 
+import seaborn as sb 
+from sckitlearn.naturallanguageprocessing import Tokenization 
+
 ]
 Here the model correctly identified that Sylvain is a person (PER), Hugging Face an organization (ORG), and Brooklyn a location (LOC).
 
